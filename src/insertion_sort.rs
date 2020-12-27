@@ -1,4 +1,5 @@
 //! Insertion sort. O(n^2).
+
 use super::get_sort_tests;
 
 fn insertion_sort_1<T: PartialOrd + Clone>(src: &mut [T]) {
@@ -19,7 +20,7 @@ fn insertion_sort_1<T: PartialOrd + Clone>(src: &mut [T]) {
 }
 
 // Look throughly at `insertion_sort_2` and `insertion_sort_3`. They show the same sorting idea: you
-// put current value in the proper place only once. To do that you have to free the place for it.
+// put `current` value in the proper place only once. To do that you have to free the place for it.
 // So you move to the right all the values in range of `0..i`, which are bigger than `src[i]` (i.e.
 // `current`).
 //
