@@ -14,7 +14,7 @@ fn bubble_sort_1<T: PartialOrd + Clone>(src: &mut [T]) {
 }
 
 // Biggest values "bubble" to the right
-fn bubble_sort_2<T: PartialOrd + Clone + std::fmt::Debug>(src: &mut [T]) {
+fn bubble_sort_2<T: PartialOrd + Clone>(src: &mut [T]) {
     for i in (1..src.len()).rev() {
         for j in 0..i {
             if src[j] > src[j + 1] {
