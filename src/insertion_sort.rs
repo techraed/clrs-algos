@@ -3,9 +3,6 @@
 use super::get_sort_tests;
 
 fn insertion_sort_1<T: PartialOrd + Clone>(src: &mut [T]) {
-    if src.len() == 1 {
-        return;
-    }
     for i in 1..src.len() {
         let current = src.get(i).expect("out of bounds").clone();
         let mut j = i - 1;
@@ -81,18 +78,35 @@ fn insertion_sort_3<T: PartialOrd + Copy>(src: &mut [T]) {
     }
 }
 
+
+// Same as insertion_sort_1, but more readable.
+fn insertion_sort_4<T: PartialOrd + Clone>(src: &mut [T]) {
+    for cur in 1..src.len() {
+        let mut i = cur;
+        while i > 0 && src[i] < src[i - 1] {
+            src.swap(i, i - 1);
+            i -= 1;
+        }
+
+    }
+
+}
+
 #[test]
 fn insertion_sort_test() {
     for (input, sorted) in get_sort_tests().iter_mut() {
         let mut input2 = input.clone();
         let mut input3 = input.clone();
+        let mut input4 = input.clone();
 
         insertion_sort_1(input);
         insertion_sort_2(&mut input2);
         insertion_sort_3(&mut input3);
+        insertion_sort_4(&mut input4);
 
         assert_eq!(input, sorted);
         assert_eq!(&mut input2, sorted);
         assert_eq!(&mut input3, sorted);
+        assert_eq!(&mut input4, sorted);
     }
 }
