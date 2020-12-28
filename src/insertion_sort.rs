@@ -78,7 +78,6 @@ fn insertion_sort_3<T: PartialOrd + Copy>(src: &mut [T]) {
     }
 }
 
-
 // Same as insertion_sort_1, but more readable.
 fn insertion_sort_4<T: PartialOrd + Clone>(src: &mut [T]) {
     for cur in 1..src.len() {
@@ -87,9 +86,7 @@ fn insertion_sort_4<T: PartialOrd + Clone>(src: &mut [T]) {
             src.swap(i, i - 1);
             i -= 1;
         }
-
     }
-
 }
 
 #[test]
