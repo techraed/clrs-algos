@@ -34,9 +34,6 @@ fn insertion_sort_1<T: PartialOrd + Clone>(src: &mut [T]) {
 // `isize` to `usize` all the time.
 
 fn insertion_sort_2<T: PartialOrd + Clone>(src: &mut [T]) {
-    if src.len() == 1 {
-        return;
-    }
     for i in 1..src.len() {
         let current = src.get(i).expect("out of bounds").clone();
         let mut j = i - 1;
@@ -57,9 +54,6 @@ fn insertion_sort_2<T: PartialOrd + Clone>(src: &mut [T]) {
 }
 
 fn insertion_sort_3<T: PartialOrd + Copy>(src: &mut [T]) {
-    if src.len() == 1 {
-        return;
-    }
     for i in 1..src.len() {
         let current = src[i];
         let mut j = i - 1;
