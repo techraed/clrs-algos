@@ -21,11 +21,41 @@ fn merge_sort_impl<T: PartialOrd + Clone + Default>(src: &mut [T]) {
 }
 
 fn merge<T: PartialOrd + Clone + Default>(src: &mut [T], mid: usize) {
+    let mut tmp = vec![T::default(); src.len()];
+    
+    let mut i = 0;
+    let mut j = mid;
+    let mut tmp_idx = 0;
+    while i < mid || j < src.len() {
+        if i == mid {
+            tmp[tmp_idx] = std::mem::take(&mut src[j]);
+            j += 1;
+            tmp_idx += 1;
+        } else if j == src.len() {
+            tmp[tmp_idx] = std::mem::take(&mut src[i]);
+            i += 1;
+            tmp_idx += 1;
+        } else if src[i] <= src[j] {
+            tmp[tmp_idx] = std::mem::take(&mut src[i]);
+            i += 1;
+            tmp_idx += 1;
+        } else {
+            tmp[tmp_idx] = std::mem::take(&mut src[j]);
+            j += 1;
+            tmp_idx += 1;
+        }
+    }
+    
+    src.clone_from_slice(&tmp);
+}
+
+// A closer to CLRS book implementation
+fn merge_clrs<T: PartialOrd + Clone + Default>(src: &mut [T], mid: usize) {
     let mut left = vec![T::default(); src[..mid].len()];
     let mut right = vec![T::default(); src[mid..].len()]; 
     left.clone_from_slice(&src[..mid]);
     right.clone_from_slice(&src[mid..]);
-    
+   
     let mut i = 0;
     let mut j = 0;
     for k in 0..src.len() {
@@ -42,7 +72,7 @@ fn merge<T: PartialOrd + Clone + Default>(src: &mut [T], mid: usize) {
             src[k] = std::mem::take(&mut right[j]);
             j += 1;
         }
-    }
+    }   
 }
 
 #[test]
