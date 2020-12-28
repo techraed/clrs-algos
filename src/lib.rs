@@ -1,5 +1,6 @@
 mod bubble_sort;
 mod insertion_sort;
+mod merge_sort;
 
 fn get_sort_tests() -> [(Vec<i32>, Vec<i32>); 17] {
     [
