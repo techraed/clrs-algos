@@ -44,11 +44,7 @@ fn insertion_sort_2<T: PartialOrd + Clone>(src: &mut [T]) {
             }
             j -= 1;
         }
-        let j = if j == 0 && &src[j] == &src[j + 1] {
-            j
-        } else {
-            j + 1
-        };
+        let j = if j == 0 && &src[j] == &src[j + 1] { j } else { j + 1 };
         src[j] = current;
     }
 }
