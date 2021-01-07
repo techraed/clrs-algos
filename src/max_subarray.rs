@@ -9,13 +9,11 @@ fn find_max_sum_subarray<T: PartialOrd + Copy + Default + Add<Output = T>>(src: 
     let mut right = None;
 
     let mut cur_left = 0;
-    let mut cur_right = 0;
     for i in 0..src.len() {
         cur_sum = cur_sum + src[i];
         if cur_sum >= max_sum {
             max_sum = cur_sum;
-            cur_right = i;
-            right = Some(cur_right);
+            right = Some(i);
             left = Some(cur_left);
         } else if cur_sum < T::default() {
             cur_left = i + 1;
@@ -53,12 +51,12 @@ fn find_max_sum_subarray_dc<T: Ord + Copy + Default + Add<Output = T>>(src: &[T]
 
     *[l, r, c]
         .into_iter() // could be an error in rust > 1.48
-        .max_by(|(l, l_sum), (r, r_sum)| {
-            l_sum.cmp(&r_sum).then_with(|| {
+        .max_by(|(x, x_sum), (y, y_sum)| {
+            x_sum.cmp(&y_sum).then_with(|| {
                 // if they have same sum, find longest sub-array
-                let l = l.map(|a| a.len());
-                let r = r.map(|a| a.len());
-                l.cmp(&r)
+                let x = x.map(|a| a.len());
+                let y = y.map(|a| a.len());
+                x.cmp(&y)
             })
         })
         .unwrap_or(&(None, T::default()))
