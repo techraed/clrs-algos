@@ -16,8 +16,8 @@ fn insertion_sort_1<T: PartialOrd + Clone>(src: &mut [T]) {
     }
 }
 
-// Look throughly at `insertion_sort_3`. You put `current` value in the proper place only once. 
-// To do that you have to free the place for it. So you move to the right all the values in range of `0..i`, 
+// Look throughly at `insertion_sort_3`. You put `current` value in the proper place only once.
+// To do that you have to free the place for it. So you move to the right all the values in range of `0..i`,
 // which are bigger than `src[i]` (i.e.`current`).
 //
 // But these implementations have crucial things to mention. Index `j` points to numbers that
