@@ -35,7 +35,7 @@ fn find_max_sum_subarray<T: PartialOrd + Copy + Default + Add<Output = T>>(src: 
 // values are less than `T::default()`. Some implementations can still work then, comparing array
 // elements with a kind of `T::MIN`. However, I decided to make a more generic approach to that.
 //
-// Clone instead of copy is more preferable in real, if we are talking about generic approach, but
+// Clone instead of copy is more preferable for real life generic solutions, but
 // it makes it harder to implement.
 fn find_max_sum_subarray_dc<T: Ord + Copy + Default + Add<Output = T>>(src: &[T]) -> (Option<&[T]>, T) {
     if src.len() == 1 {
