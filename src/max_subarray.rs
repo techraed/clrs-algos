@@ -33,7 +33,7 @@ pub fn find_max_sum_subarray_kadane<T: PartialOrd + Copy + Default + Add<Output 
     }
     let left = left.expect("none returned earlier");
     let right = right.map(|i| i + 1).expect("none returned earlier");
-    return (Some(&src[left..right]), max_sum);
+    (Some(&src[left..right]), max_sum)
 }
 
 /// Divide and conquer implementation. O(n*log n)
@@ -60,7 +60,7 @@ pub fn find_max_sum_subarray_dc<T: Ord + Copy + Default + Add<Output = T>>(src: 
     [l, r, c]
         .iter()
         .max_by(|(x, x_sum), (y, y_sum)| {
-            x_sum.cmp(&y_sum).then_with(|| {
+            x_sum.cmp(y_sum).then_with(|| {
                 // if they have same sum, find longest sub-array
                 let x = x.map(|a| a.len());
                 let y = y.map(|a| a.len());
@@ -100,7 +100,7 @@ fn find_max_sum_cross_subarray<T: Ord + Copy + Default + Add<Output = T>>(src: &
     }
     let left = left.unwrap_or(mid);
     let right = right.map(|i| i + 1).unwrap_or(mid);
-    return (Some(&src[left..right]), left_sum + right_sum);
+    (Some(&src[left..right]), left_sum + right_sum)
 }
 
 #[test]

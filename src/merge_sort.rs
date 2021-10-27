@@ -8,7 +8,7 @@
 /// After the division we should "combine" sorted subarrays using an appropriate procedure (i.e. `merge`).
 pub fn merge_sort<T: PartialOrd + Clone + Default>(src: &mut [T]) {
     match src.len() {
-        0 | 1 => return,
+        0 | 1 => {}
         2 => {
             if src[0] > src[1] {
                 src.swap(0, 1)
@@ -35,23 +35,21 @@ fn merge<T: PartialOrd + Clone + Default>(src: &mut [T], mid: usize) {
     let mut j = mid;
     let mut tmp_idx = 0;
     while i < mid || j < src.len() {
-        if i == mid {
-            tmp[tmp_idx] = std::mem::take(&mut src[j]);
+        let smallest_value_idx = if i == mid {
             j += 1;
-            tmp_idx += 1;
+            j - 1
         } else if j == src.len() {
-            tmp[tmp_idx] = std::mem::take(&mut src[i]);
             i += 1;
-            tmp_idx += 1;
+            i - 1
         } else if src[i] <= src[j] {
-            tmp[tmp_idx] = std::mem::take(&mut src[i]);
             i += 1;
-            tmp_idx += 1;
+            i - 1
         } else {
-            tmp[tmp_idx] = std::mem::take(&mut src[j]);
             j += 1;
-            tmp_idx += 1;
-        }
+            j - 1
+        };
+        tmp[tmp_idx] = std::mem::take(&mut src[smallest_value_idx]);
+        tmp_idx += 1;
     }
 
     src.clone_from_slice(&tmp);
