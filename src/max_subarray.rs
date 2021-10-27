@@ -67,7 +67,7 @@ pub fn find_max_sum_subarray_dc<T: Ord + Copy + Default + Add<Output = T>>(src: 
                 x.cmp(&y)
             })
         })
-        .map(|a| *a)
+        .copied()
         .unwrap_or((None, T::default()))
 }
 

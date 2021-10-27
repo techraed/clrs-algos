@@ -51,7 +51,7 @@ pub fn heap_sort<T: PartialOrd + Clone>(src: &mut [T]) {
 fn heap_sort_impl<T: PartialOrd + Clone>(src: &mut [T]) {
     build_max_heap(src);
     let mut heap_size = src.len();
-    for node_index in (1..src.len()).rev() {
+    for node_index in (1..heap_size).rev() {
         src.swap(0, node_index);
         heap_size -= 1;
         max_heapify(&mut src[..heap_size], 0);
@@ -59,8 +59,7 @@ fn heap_sort_impl<T: PartialOrd + Clone>(src: &mut [T]) {
 }
 
 fn build_max_heap<T: PartialOrd + Clone>(src: &mut [T]) {
-    let heap_size = src.len();
-    let last_leaf_index = heap_size - 1;
+    let last_leaf_index = src.len() - 1;
     let last_leaf_parent_index = match last_leaf_index % 2 {
         0 => last_leaf_index / 2 - 1,
         1 => last_leaf_index / 2,
@@ -71,24 +70,28 @@ fn build_max_heap<T: PartialOrd + Clone>(src: &mut [T]) {
     }
 }
 
+// Recursive version is very expensive and leads to stack overflow
 fn max_heapify<T: PartialOrd + Clone>(src: &mut [T], start_from: usize) {
     let mut largest_index = start_from;
-    let left_child_index = largest_index * 2 + 1;
-    let right_child_index = largest_index * 2 + 2;
+    loop {
+        let parent_index = largest_index;
+        let left_child_index = largest_index * 2 + 1;
+        let right_child_index = largest_index * 2 + 2;
 
-    if let Some(left_child) = src.get(left_child_index) {
-        if left_child > &src[largest_index] {
-            largest_index = left_child_index;
+        let subtree = [parent_index, left_child_index, right_child_index];
+        largest_index = subtree
+            .iter()
+            .filter_map(|&idx| src.get(idx))
+            .enumerate()
+            .reduce(|tup1, tup2| if tup1.1 > tup2.1 { tup1 } else { tup2 })
+            .map(|(idx, _)| subtree[idx])
+            .expect("iterator isn't empty");
+
+        if parent_index != largest_index {
+            src.swap(parent_index, largest_index);
+            continue;
         }
-    }
-    if let Some(right_child) = src.get(right_child_index) {
-        if right_child > &src[largest_index] {
-            largest_index = right_child_index;
-        }
-    }
-    if largest_index != start_from {
-        src.swap(start_from, largest_index);
-        max_heapify(src, largest_index);
+        return;
     }
 }
 
@@ -98,7 +101,3 @@ fn heap_sort_test() {
 
     assert!(test_sorting_algorithm(heap_sort).is_ok());
 }
-
-// There are basically 2 heap types:
-// - min heap, where nodes are presented in a non-decreasing order;
-// - max heap,
