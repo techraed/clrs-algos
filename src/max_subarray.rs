@@ -8,7 +8,7 @@ use std::ops::Add;
 
 /// Kadane's max subarray algorithm implementation finding solution within O(n) time.
 ///
-/// Notice that by utilizing an additional index we reduced solution to O(n) comparing to `find_max_sum_subarray_dc`.
+/// Notice that by utilizing an additional index we reduced solution to O(n) comparing to [find_max_sum_subarray_dc](fn.find_max_sum_subarray_dc.html).
 pub fn find_max_sum_subarray_kadane<T: PartialOrd + Copy + Default + Add<Output = T>>(src: &[T]) -> (Option<&[T]>, T) {
     let mut max_sum = T::default();
     let mut cur_sum = T::default();
@@ -36,15 +36,15 @@ pub fn find_max_sum_subarray_kadane<T: PartialOrd + Copy + Default + Add<Output 
     return (Some(&src[left..right]), max_sum);
 }
 
-// Divide and conquer implementation. O(n*log n)
-//
-// Finds maximum sum sub-array. If there are several subarrays with maximum sum, then returns the
-// longest. If there are no matching sub-arrays, returns 0. By saying "no matching", I mean all the
-// values are less than `T::default()`. Some implementations can still work then, comparing array
-// elements with a kind of `T::MIN`. However, I decided to make a more generic approach to that.
-//
-// Clone instead of copy is more preferable for real life generic solutions, but
-// it makes it harder to implement.
+/// Divide and conquer implementation. O(n*log n)
+///
+/// Finds maximum sum sub-array. If there are several subarrays with maximum sum, then returns the
+/// longest. If there are no matching sub-arrays, returns 0. By saying "no matching", I mean all the
+/// values are less than `T::default()`. Some implementations can still work then, comparing array
+/// elements with a kind of `T::MIN`. However, I decided to make a more generic approach to that.
+///
+/// Clone instead of copy is more preferable for real life generic solutions, but
+/// it makes it harder to implement.
 pub fn find_max_sum_subarray_dc<T: Ord + Copy + Default + Add<Output = T>>(src: &[T]) -> (Option<&[T]>, T) {
     if src.len() == 1 {
         if src[0] >= T::default() {

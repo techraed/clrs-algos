@@ -57,7 +57,7 @@ fn merge<T: PartialOrd + Clone + Default>(src: &mut [T], mid: usize) {
     src.clone_from_slice(&tmp);
 }
 
-/// A closer to CLRS book implementation of merge procedure
+/// A closer to CLRS book implementation of merge procedure.
 #[allow(unused)]
 fn merge_clrs<T: PartialOrd + Clone + Default>(src: &mut [T], mid: usize) {
     let mut left = vec![T::default(); src[..mid].len()];
