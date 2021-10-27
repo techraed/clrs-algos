@@ -1,6 +1,12 @@
-use super::get_sort_tests;
+//! Merge sort. O(n*log n).
+//! Algorithm works using Divide & Conquer (& Combine) strategy.
 
-fn merge_sort<T: PartialOrd + Clone + Default>(src: &mut [T]) {
+/// Merge sort
+///
+/// Basically, this merge sort divides an input array into small subarrays until their sizes will be so small
+/// that finding solution for them will be incredibly easy (i.e. O(1).
+/// After the division we should "combine" sorted subarrays using an appropriate procedure (i.e. `merge`).
+pub fn merge_sort<T: PartialOrd + Clone + Default>(src: &mut [T]) {
     match src.len() {
         0 | 1 => return,
         2 => {
@@ -13,10 +19,12 @@ fn merge_sort<T: PartialOrd + Clone + Default>(src: &mut [T]) {
 }
 
 fn merge_sort_impl<T: PartialOrd + Clone + Default>(src: &mut [T]) {
-    // middle element index is q-1
+    // Divide: middle element index is q-1
     let q = (src.len() + 1) / 2;
+    // Conquer
     merge_sort(&mut src[..q]);
     merge_sort(&mut src[q..]);
+    // Combine
     merge(src, q);
 }
 
@@ -49,7 +57,8 @@ fn merge<T: PartialOrd + Clone + Default>(src: &mut [T], mid: usize) {
     src.clone_from_slice(&tmp);
 }
 
-// A closer to CLRS book implementation
+/// A closer to CLRS book implementation of merge procedure
+#[allow(unused)]
 fn merge_clrs<T: PartialOrd + Clone + Default>(src: &mut [T], mid: usize) {
     let mut left = vec![T::default(); src[..mid].len()];
     let mut right = vec![T::default(); src[mid..].len()];
@@ -77,8 +86,7 @@ fn merge_clrs<T: PartialOrd + Clone + Default>(src: &mut [T], mid: usize) {
 
 #[test]
 fn merge_sort_test() {
-    for (input, sorted) in get_sort_tests().iter_mut() {
-        merge_sort(input);
-        assert_eq!(input, sorted);
-    }
+    use crate::test_utils::test_sorting_algorithm;
+
+    assert!(test_sorting_algorithm(merge_sort).is_ok());
 }

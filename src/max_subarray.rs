@@ -1,7 +1,15 @@
+//! Finding maximum subarray algorithms.
+//!
+//! There are two main implementations:
+//! - the one using Divide & Conquer (& Combine) strategy, which has O(n*log n) complexity;
+//! - the Kadane's algorithm implementation, which has O(n) complexity.
+
 use std::ops::Add;
 
-// Kadane's algorithm implementation finding solution within O(n) time.
-fn find_max_sum_subarray<T: PartialOrd + Copy + Default + Add<Output = T>>(src: &[T]) -> (Option<&[T]>, T) {
+/// Kadane's max subarray algorithm implementation finding solution within O(n) time.
+///
+/// Notice that by utilizing an additional index we reduced solution to O(n) comparing to `find_max_sum_subarray_dc`.
+pub fn find_max_sum_subarray_kadane<T: PartialOrd + Copy + Default + Add<Output = T>>(src: &[T]) -> (Option<&[T]>, T) {
     let mut max_sum = T::default();
     let mut cur_sum = T::default();
 
@@ -28,7 +36,7 @@ fn find_max_sum_subarray<T: PartialOrd + Copy + Default + Add<Output = T>>(src: 
     return (Some(&src[left..right]), max_sum);
 }
 
-// Divide and conquer implementation. O(n*lgn)
+// Divide and conquer implementation. O(n*log n)
 //
 // Finds maximum sum sub-array. If there are several subarrays with maximum sum, then returns the
 // longest. If there are no matching sub-arrays, returns 0. By saying "no matching", I mean all the
@@ -37,7 +45,7 @@ fn find_max_sum_subarray<T: PartialOrd + Copy + Default + Add<Output = T>>(src: 
 //
 // Clone instead of copy is more preferable for real life generic solutions, but
 // it makes it harder to implement.
-fn find_max_sum_subarray_dc<T: Ord + Copy + Default + Add<Output = T>>(src: &[T]) -> (Option<&[T]>, T) {
+pub fn find_max_sum_subarray_dc<T: Ord + Copy + Default + Add<Output = T>>(src: &[T]) -> (Option<&[T]>, T) {
     if src.len() == 1 {
         if src[0] >= T::default() {
             return (Some(src), src[0]);
@@ -49,8 +57,8 @@ fn find_max_sum_subarray_dc<T: Ord + Copy + Default + Add<Output = T>>(src: &[T]
     let r = find_max_sum_subarray_dc(&src[mid..]);
     let c = find_max_sum_cross_subarray(src, mid);
 
-    *[l, r, c]
-        .into_iter() // could be an error in rust > 1.48
+    [l, r, c]
+        .iter()
         .max_by(|(x, x_sum), (y, y_sum)| {
             x_sum.cmp(&y_sum).then_with(|| {
                 // if they have same sum, find longest sub-array
@@ -59,7 +67,8 @@ fn find_max_sum_subarray_dc<T: Ord + Copy + Default + Add<Output = T>>(src: &[T]
                 x.cmp(&y)
             })
         })
-        .unwrap_or(&(None, T::default()))
+        .map(|a| *a)
+        .unwrap_or((None, T::default()))
 }
 
 fn find_max_sum_cross_subarray<T: Ord + Copy + Default + Add<Output = T>>(src: &[T], mid: usize) -> (Option<&[T]>, T) {
@@ -121,7 +130,7 @@ fn base_max_subarray_test() {
     ];
     for (case_num, (case, res)) in test_cases.iter().enumerate() {
         let (slice1, sum1) = find_max_sum_subarray_dc(case);
-        let (slice2, sum2) = find_max_sum_subarray(case);
+        let (slice2, sum2) = find_max_sum_subarray_kadane(case);
         // consider in some cases difference
         if slice1 != slice2 {
             println!("Case {}. D&C result {:?} -- Kadane result {:?}", case_num + 1, slice1, slice2);
