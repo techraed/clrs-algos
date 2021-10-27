@@ -9,4 +9,4 @@ I don't try to implement fastest, most optimized solutions, just ones which ease
 Simply run `cargo test`.
 
 ## Docs
-Build docs yourself simply running `cargo doc --no-deps --open`.
+Build docs yourself simply by running `cargo doc --no-deps --open`.
