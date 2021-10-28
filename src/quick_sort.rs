@@ -10,11 +10,11 @@
 //!
 //! Obviously, recursion tree has O(log n) height. Each height requires O(n) computations - O(n)*O(log n) = O(n*log n).
 
-/// Types of partitioning.
+/// Partitioner providing different types of partitioning.
 ///
 /// The core of the quick sort is partitioning. We can implement different partitioning algorithms, which should follow the idea stated in the module [doc](index.html).
 #[derive(Clone, Copy)]
-pub enum PartitioningType {
+pub enum Partitioner {
     /// Partitioning algorithm provided by Nico Lomuto.
     ///
     /// The main idea is that we choose the pivot value (which in current implementation is the last one in the array) and
@@ -32,7 +32,7 @@ pub enum PartitioningType {
     Hoare,
 }
 
-pub fn quick_sort<T: PartialOrd + Clone>(src: &mut [T], partitioning_type: PartitioningType) {
+pub fn quick_sort<T: PartialOrd + Clone>(src: &mut [T], partitioner: Partitioner) {
     match src.len() {
         0 | 1 => {}
         2 => {
@@ -40,22 +40,21 @@ pub fn quick_sort<T: PartialOrd + Clone>(src: &mut [T], partitioning_type: Parti
                 src.swap(0, 1)
             }
         }
-        _ => quick_sort_impl(src, partitioning_type),
+        _ => quick_sort_impl(src, partitioner),
     }
 }
 
-fn quick_sort_impl<T: PartialOrd + Clone>(src: &mut [T], partitioning_type: PartitioningType) {
-    let partition_procedure = partitioning_type.get_func::<T>();
-    let q = partition_procedure(src);
-    quick_sort(&mut src[..q], partitioning_type);
-    quick_sort(&mut src[q + 1..], partitioning_type);
+fn quick_sort_impl<T: PartialOrd + Clone>(src: &mut [T], partitioner: Partitioner) {
+    let q = partitioner.run(src);
+    quick_sort(&mut src[..q], partitioner);
+    quick_sort(&mut src[q + 1..], partitioner);
 }
 
-impl PartitioningType {
-    pub fn get_func<T: PartialOrd + Clone>(self) -> fn(&mut [T]) -> usize {
+impl Partitioner {
+    pub fn run<T: PartialOrd + Clone>(self, src: &mut [T]) -> usize {
         match self {
-            PartitioningType::Lomuto => lomuto_partitioning::<T>,
-            PartitioningType::Hoare => todo!(),
+            Partitioner::Lomuto => lomuto_partitioning(src),
+            Partitioner::Hoare => todo!(),
         }
     }
 }
@@ -105,7 +104,7 @@ fn quick_sort_test() {
     use crate::test_utils::get_test_vectors;
 
     for (input, sorted) in get_test_vectors().iter_mut() {
-        quick_sort(input, PartitioningType::Lomuto);
+        quick_sort(input, Partitioner::Lomuto);
         assert_eq!(input, sorted)
     }
 }
