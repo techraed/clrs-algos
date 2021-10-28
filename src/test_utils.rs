@@ -1,6 +1,18 @@
 #[cfg(test)]
 pub(crate) fn test_sorting_algorithm(f: fn(&mut [i32])) -> Result<(), ()> {
-    let mut test_vectors = [
+    let mut test_vectors = get_test_vectors();
+    for (input, sorted) in test_vectors.iter_mut() {
+        f(input);
+        if !input.starts_with(sorted) {
+            return Err(());
+        }
+    }
+    Ok(())
+}
+
+#[cfg(test)]
+pub(crate) fn get_test_vectors() -> [(Vec<i32>, Vec<i32>); 17] {
+    [
         (vec![9, 2, 3, 4, 1, 6, 8, 19, 20, 34], vec![1, 2, 3, 4, 6, 8, 9, 19, 20, 34]),
         (vec![10, 80, 30, 70, 40, 50, 90], vec![10, 30, 40, 50, 70, 80, 90]),
         (vec![2, 3, 4, 5, 10, 1, 11], vec![1, 2, 3, 4, 5, 10, 11]),
@@ -21,12 +33,5 @@ pub(crate) fn test_sorting_algorithm(f: fn(&mut [i32])) -> Result<(), ()> {
         (vec![-6, 9, 0, 1, 17, 91, 0, 178], vec![-6, 0, 0, 1, 9, 17, 91, 178]),
         (vec![-3, -2, -1, -9, -5, -1, -19, -33], vec![-33, -19, -9, -5, -3, -2, -1, -1]),
         (vec![-5, -6, -7, 0, 0, 0, 0, -8, 1, 2, 3], vec![-8, -7, -6, -5, 0, 0, 0, 0, 1, 2, 3]),
-    ];
-    for (input, sorted) in test_vectors.iter_mut() {
-        f(input);
-        if !input.starts_with(sorted) {
-            return Err(());
-        }
-    }
-    Ok(())
+    ]
 }
