@@ -1,4 +1,4 @@
-//! Insertion sort. O(n^2).
+//! Insertion sort. Θ(n^2).
 //! Incremental algorithm which looks for a proper place in sorted area for the value from unsorted area.
 
 /// Insertion sort implementation.

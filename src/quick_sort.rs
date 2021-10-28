@@ -8,7 +8,7 @@
 //! What's more, we recursively perform partitioning on each these 2 areas. So in the end we have guarantee that there is a sequence of areas of length
 //! *N* which varies from 1 to input.length/2 and elements of the left sequence are smaller than elements of the right sequence.
 //!
-//! Obviously, recursion tree has O(log n) height. Each height requires O(n) computations - O(n)*O(log n) = O(n*log n).
+//! Obviously, recursion tree has O(log n) height. Each height requires O(n) computations - O(n) * O(log n) = O(n * log n).
 
 /// Partitioner providing different types of partitioning.
 ///
@@ -24,7 +24,7 @@ pub enum Partitioner {
     /// Then we return to the basic sorting procedure the index of the pivot, which is next used to divide the array to subarrays in order to
     /// perform partitioning on them.
     Lomuto,
-    /// Tony Hoare's partitioning algorithms.
+    /// Tony Hoare's partitioning algorithm.
     ///
     /// The idea is the same, but has one significant difference with Nico Lomuto's version: we do not monitor pivots value. We actually don't care about
     /// placing it to some position. The main thing is to form 2 subarrays where values of the left one are less than values of the right one. However, Hoare's
@@ -32,6 +32,7 @@ pub enum Partitioner {
     Hoare,
 }
 
+// todo docs
 pub fn quick_sort<T: PartialOrd + Clone>(src: &mut [T], partitioner: Partitioner) {
     match src.len() {
         0 | 1 => {}
