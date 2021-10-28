@@ -10,8 +10,6 @@
 //!
 //! Obviously, recursion tree has O(log n) height. Each height requires O(n) computations - O(n)*O(log n) = O(n*log n).
 
-use std::fmt::Debug;
-
 /// Types of partitioning.
 ///
 /// The core of the quick sort is partitioning. We can implement different partitioning algorithms, which should follow the idea stated in the module [doc](index.html).
@@ -34,7 +32,7 @@ pub enum PartitioningType {
     Hoare,
 }
 
-pub fn quick_sort<T: PartialOrd + Clone + Debug>(src: &mut [T], partitioning_type: PartitioningType) {
+pub fn quick_sort<T: PartialOrd + Clone>(src: &mut [T], partitioning_type: PartitioningType) {
     match src.len() {
         0 | 1 => {}
         2 => {
@@ -46,7 +44,7 @@ pub fn quick_sort<T: PartialOrd + Clone + Debug>(src: &mut [T], partitioning_typ
     }
 }
 
-fn quick_sort_impl<T: PartialOrd + Clone + Debug>(src: &mut [T], partitioning_type: PartitioningType) {
+fn quick_sort_impl<T: PartialOrd + Clone>(src: &mut [T], partitioning_type: PartitioningType) {
     let partition_procedure = partitioning_type.get_func::<T>();
     let q = partition_procedure(src);
     quick_sort(&mut src[..q], partitioning_type);
@@ -54,7 +52,7 @@ fn quick_sort_impl<T: PartialOrd + Clone + Debug>(src: &mut [T], partitioning_ty
 }
 
 impl PartitioningType {
-    pub fn get_func<T: PartialOrd + Clone + Debug>(self) -> fn(&mut [T]) -> usize {
+    pub fn get_func<T: PartialOrd + Clone>(self) -> fn(&mut [T]) -> usize {
         match self {
             PartitioningType::Lomuto => lomuto_partitioning::<T>,
             PartitioningType::Hoare => todo!(),
@@ -62,23 +60,44 @@ impl PartitioningType {
     }
 }
 
-fn lomuto_partitioning<T: PartialOrd + Clone + Debug>(src: &mut [T]) -> usize {
+/// Basically, it `more_than_pivot_start` is the index of the first element if the right array.
+/// It means that last element of the left array is at index `more_than_pivot_start - 1`.
+/// When less (or equal) than pivot element is found we place it to the end of the left array.
+///
+/// A closer to CLRS version:
+/// ```rust
+/// fn lomuto_partitioning<T: PartialOrd + Clone>(src: &mut [T]) -> usize {
+///     let pivot_idx = src.len() - 1;
+///     let mut less_than_pivot_offset_opt = None;
+///     for more_than_pivot_offset in 0..pivot_idx {
+///         if src[more_than_pivot_offset] <= src[pivot_idx] {
+///             less_than_pivot_offset_opt = less_than_pivot_offset_opt.map(increment).or(Some(0));
+///             src.swap(less_than_pivot_offset_opt.expect("less than pivot array is founded"), more_than_pivot_offset)
+///         }
+///     }
+///     let pivot_proper_idx = less_than_pivot_offset_opt.map_or(0, increment);
+///     src.swap(pivot_idx, pivot_proper_idx);
+///     pivot_proper_idx
+/// }
+///
+/// #[inline]
+/// fn increment(num: usize) -> usize {
+///     num + 1
+/// }
+/// ```
+fn lomuto_partitioning<T: PartialOrd + Clone>(src: &mut [T]) -> usize {
     let pivot_idx = src.len() - 1;
-    let mut less_than_pivot_offset = None;
-    for more_than_pivot_offset in 0..pivot_idx {
-        if src[more_than_pivot_offset] <= src[pivot_idx] {
-            less_than_pivot_offset = less_than_pivot_offset.map(increment).or(Some(0));
-            src.swap(less_than_pivot_offset.expect("less than pivot array is founded"), more_than_pivot_offset)
+    let mut more_than_pivot_start = 0;
+    for more_than_pivot_end in 0..pivot_idx {
+        if src[more_than_pivot_end] <= src[pivot_idx] {
+            // increasing left area array by one and placing to it's end found element
+            more_than_pivot_start += 1;
+            src.swap(more_than_pivot_start - 1, more_than_pivot_end)
         }
     }
-    let pivot_proper_idx = less_than_pivot_offset.map_or(0, increment);
-    src.swap(pivot_idx, pivot_proper_idx);
-    pivot_proper_idx
-}
-
-#[inline]
-fn increment(num: usize) -> usize {
-    num + 1
+    let proper_pivot_idx = more_than_pivot_start;
+    src.swap(pivot_idx, proper_pivot_idx);
+    proper_pivot_idx
 }
 
 #[test]
