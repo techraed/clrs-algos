@@ -32,7 +32,10 @@ pub enum Partitioner {
     Hoare,
 }
 
-// todo docs
+/// Quick sort algorithm implementation
+///
+/// Parametrized by `partitioner` function. Actually `partitioner` is an enum, but under the hood runs
+/// one of partitioning algorithms.
 pub fn quick_sort<T: PartialOrd + Clone>(src: &mut [T], partitioner: Partitioner) {
     match src.len() {
         0 | 1 => {}
@@ -46,16 +49,33 @@ pub fn quick_sort<T: PartialOrd + Clone>(src: &mut [T], partitioner: Partitioner
 }
 
 fn quick_sort_impl<T: PartialOrd + Clone>(src: &mut [T], partitioner: Partitioner) {
-    let q = partitioner.run(src);
-    quick_sort(&mut src[..q], partitioner);
-    quick_sort(&mut src[q + 1..], partitioner);
+    let (end_left, start_right) = partitioner.run(src);
+    quick_sort(&mut src[..end_left], partitioner);
+    quick_sort(&mut src[start_right..], partitioner);
 }
 
 impl Partitioner {
-    pub fn run<T: PartialOrd + Clone>(self, src: &mut [T]) -> usize {
+    /// Performs partitioning algorithm on `src`.
+    ///
+    /// Returns ending index for the left array and starting index for the right array respectively.
+    ///
+    /// # Note
+    /// The value under ending index of the left array isn't a part of the left `slice`. For example,
+    /// ```rust
+    /// # let mut src = [1,2,3];
+    /// # let end_left = 1;
+    /// let left_array = &mut src[..end_left];
+    /// ```
+    pub fn run<T: PartialOrd + Clone>(self, src: &mut [T]) -> (usize, usize) {
         match self {
-            Partitioner::Lomuto => lomuto_partitioning(src),
-            Partitioner::Hoare => todo!(),
+            Partitioner::Lomuto => {
+                let q = lomuto_partitioning(src);
+                (q, q + 1)
+            }
+            Partitioner::Hoare => {
+                let q = hoare_partitioning(src);
+                (q + 1, q + 1)
+            }
         }
     }
 }
@@ -87,17 +107,51 @@ impl Partitioner {
 /// ```
 fn lomuto_partitioning<T: PartialOrd + Clone>(src: &mut [T]) -> usize {
     let pivot_idx = src.len() - 1;
-    let mut more_than_pivot_start = 0;
-    for more_than_pivot_end in 0..pivot_idx {
-        if src[more_than_pivot_end] <= src[pivot_idx] {
+    let mut greater_than_pivot_start = 0;
+    for greater_than_pivot_end in 0..pivot_idx {
+        if src[greater_than_pivot_end] <= src[pivot_idx] {
             // increasing left area array by one and placing to it's end found element
-            more_than_pivot_start += 1;
-            src.swap(more_than_pivot_start - 1, more_than_pivot_end)
+            greater_than_pivot_start += 1;
+            src.swap(greater_than_pivot_start - 1, greater_than_pivot_end)
         }
     }
-    let proper_pivot_idx = more_than_pivot_start;
+    let proper_pivot_idx = greater_than_pivot_start;
     src.swap(pivot_idx, proper_pivot_idx);
     proper_pivot_idx
+}
+
+// todo implement without cloning
+fn hoare_partitioning<T: PartialOrd + Clone>(src: &mut [T]) -> usize {
+    let pivot_value = src[0].clone();
+    let mut less_than_pivot_end_opt = None;
+    let mut greater_than_pivot_start = src.len();
+    loop {
+        'g: loop {
+            greater_than_pivot_start -= 1;
+            if src[greater_than_pivot_start] <= pivot_value {
+                break 'g;
+            }
+        }
+        'l: loop {
+            less_than_pivot_end_opt = less_than_pivot_end_opt.map(increment).or(Some(0));
+            if src[less_than_pivot_end_opt.expect("some value is set")] >= pivot_value {
+                break 'l;
+            }
+        }
+
+        if let Some(less_than_pivot_end) = less_than_pivot_end_opt {
+            if less_than_pivot_end < greater_than_pivot_start {
+                src.swap(less_than_pivot_end, greater_than_pivot_start);
+            } else {
+                break greater_than_pivot_start;
+            }
+        }
+    }
+}
+
+#[inline]
+fn increment(num: usize) -> usize {
+    num + 1
 }
 
 #[test]
@@ -105,7 +159,11 @@ fn quick_sort_test() {
     use crate::test_utils::get_test_vectors;
 
     for (input, sorted) in get_test_vectors().iter_mut() {
+        let mut input2 = input.clone();
         quick_sort(input, Partitioner::Lomuto);
-        assert_eq!(input, sorted)
+        quick_sort(&mut input2, Partitioner::Hoare);
+
+        assert_eq!(input, sorted);
+        assert_eq!(&mut input2, sorted);
     }
 }
