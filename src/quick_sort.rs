@@ -10,6 +10,9 @@
 //!
 //! Obviously, recursion tree has O(log n) height. Each height requires O(n) computations - O(n) * O(log n) = O(n * log n).
 
+use std::cmp::Ordering;
+use std::fmt::Debug;
+
 /// Partitioner providing different types of partitioning.
 ///
 /// The core of the quick sort is partitioning. We can implement different partitioning algorithms, which should follow the idea stated in the module [doc](index.html).
@@ -36,7 +39,7 @@ pub enum Partitioner {
 ///
 /// Parametrized by `partitioner` function. Actually `partitioner` is an enum, but under the hood runs
 /// one of partitioning algorithms.
-pub fn quick_sort<T: PartialOrd + Clone>(src: &mut [T], partitioner: Partitioner) {
+pub fn quick_sort<T: PartialOrd + Clone+Debug>(src: &mut [T], partitioner: Partitioner) {
     match src.len() {
         0 | 1 => {}
         2 => {
@@ -48,8 +51,9 @@ pub fn quick_sort<T: PartialOrd + Clone>(src: &mut [T], partitioner: Partitioner
     }
 }
 
-fn quick_sort_impl<T: PartialOrd + Clone>(src: &mut [T], partitioner: Partitioner) {
+fn quick_sort_impl<T: PartialOrd + Clone+Debug>(src: &mut [T], partitioner: Partitioner) {
     let (end_left, start_right) = partitioner.run(src);
+    println!("{:?}", src);
     quick_sort(&mut src[..end_left], partitioner);
     quick_sort(&mut src[start_right..], partitioner);
 }
@@ -66,7 +70,7 @@ impl Partitioner {
     /// # let end_left = 1;
     /// let left_array = &mut src[..end_left];
     /// ```
-    pub fn run<T: PartialOrd + Clone>(self, src: &mut [T]) -> (usize, usize) {
+    pub fn run<T: PartialOrd + Clone + Debug>(self, src: &mut [T]) -> (usize, usize) {
         match self {
             Partitioner::Lomuto => {
                 let q = lomuto_partitioning(src);
@@ -120,38 +124,74 @@ fn lomuto_partitioning<T: PartialOrd + Clone>(src: &mut [T]) -> usize {
     proper_pivot_idx
 }
 
-// todo implement without cloning
-fn hoare_partitioning<T: PartialOrd + Clone>(src: &mut [T]) -> usize {
-    let pivot_value = src[0].clone();
-    let mut less_than_pivot_end_opt = None;
+///
+/// A closer to CLRS implementation
+/// ```rust
+/// fn hoare_partitioning<T: PartialOrd + Clone>(src: &mut [T]) -> usize {
+///     let pivot_value = src[0].clone();
+///     let mut less_than_pivot_end_opt = None;
+///     let mut greater_than_pivot_start = src.len();
+///     loop {
+///         'g: loop {
+///             greater_than_pivot_start -= 1;
+///             if src[greater_than_pivot_start] <= pivot_value {
+///                 break 'g;
+///             }
+///         }
+///         'l: loop {
+///             less_than_pivot_end_opt = less_than_pivot_end_opt.map(increment).or(Some(0));
+///             if src[less_than_pivot_end_opt.expect("some value is set")] >= pivot_value {
+///                 break 'l;
+///             }
+///         }
+/// 
+///         if let Some(less_than_pivot_end) = less_than_pivot_end_opt {
+///             if less_than_pivot_end < greater_than_pivot_start {
+///                 src.swap(less_than_pivot_end, greater_than_pivot_start);
+///             } else {
+///                 break greater_than_pivot_start;
+///             }
+///         }
+///     }
+/// }
+/// 
+/// #[inline]
+/// fn increment(num: usize) -> usize {
+///     num + 1
+/// }
+/// ```
+fn hoare_partitioning<T: PartialOrd + Clone + Debug>(src: &mut [T]) -> usize {
+    let mut pivot_idx = 0;
+    let mut less_than_pivot_end = 0;
     let mut greater_than_pivot_start = src.len();
     loop {
         'g: loop {
             greater_than_pivot_start -= 1;
-            if src[greater_than_pivot_start] <= pivot_value {
+            if src[greater_than_pivot_start] <= src[pivot_idx] {
                 break 'g;
             }
         }
         'l: loop {
-            less_than_pivot_end_opt = less_than_pivot_end_opt.map(increment).or(Some(0));
-            if src[less_than_pivot_end_opt.expect("some value is set")] >= pivot_value {
+            less_than_pivot_end = if less_than_pivot_end == 0 { less_than_pivot_end } else { less_than_pivot_end + 1};
+            if src[less_than_pivot_end] >= src[pivot_idx] {
                 break 'l;
             }
         }
 
-        if let Some(less_than_pivot_end) = less_than_pivot_end_opt {
-            if less_than_pivot_end < greater_than_pivot_start {
+        match less_than_pivot_end.cmp(&greater_than_pivot_start) {
+            Ordering::Less => {
+                // if less_than_pivot_end == pivot_idx {
+                //     pivot_idx = greater_than_pivot_start;
+                // } else if greater_than_pivot_start == pivot_idx {
+                //     pivot_idx = less_than_pivot_end;
+                // }
                 src.swap(less_than_pivot_end, greater_than_pivot_start);
-            } else {
+            }
+            Ordering::Equal | Ordering::Greater => {
                 break greater_than_pivot_start;
             }
         }
     }
-}
-
-#[inline]
-fn increment(num: usize) -> usize {
-    num + 1
 }
 
 #[test]
@@ -160,10 +200,10 @@ fn quick_sort_test() {
 
     for (input, sorted) in get_test_vectors().iter_mut() {
         let mut input2 = input.clone();
-        quick_sort(input, Partitioner::Lomuto);
+        // quick_sort(input, Partitioner::Lomuto);
         quick_sort(&mut input2, Partitioner::Hoare);
 
-        assert_eq!(input, sorted);
+        // assert_eq!(input, sorted);
         assert_eq!(&mut input2, sorted);
     }
 }
