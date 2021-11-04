@@ -144,7 +144,7 @@ fn lomuto_partitioning<T: PartialOrd + Clone>(src: &mut [T]) -> usize {
 ///                 break 'l;
 ///             }
 ///         }
-/// 
+///
 ///         if let Some(less_than_pivot_end) = less_than_pivot_end_opt {
 ///             if less_than_pivot_end < greater_than_pivot_start {
 ///                 src.swap(less_than_pivot_end, greater_than_pivot_start);
@@ -154,7 +154,7 @@ fn lomuto_partitioning<T: PartialOrd + Clone>(src: &mut [T]) -> usize {
 ///         }
 ///     }
 /// }
-/// 
+///
 /// #[inline]
 /// fn increment(num: usize) -> usize {
 ///     num + 1
