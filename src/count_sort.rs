@@ -14,33 +14,40 @@
 //! Should be mentioned that it is a [stable](https://en.wikipedia.org/wiki/Sorting_algorithm#Stability) sorting algorithm, which is an important feature
 //! for some other algorithms that can use count sort, for example, [radix sort](todo).
 
-pub trait Num: Copy {
-    fn to_usize(self) -> usize {
-        todo!("https://docs.rs/num/0.4.0/num/trait.PrimInt.html#tymethod.to_be")
+use num::ToPrimitive;
+
+/// Count sort entry function
+///
+/// If `src` inner data has a primitive type and can be casted to usize, then the sort will be performed.
+/// Otherwise no mutations will be made on `src`.
+pub fn count_sort<T: ToPrimitive + Ord + Copy>(src: &mut [T]) {
+    let max_element = src.iter().max();
+    if max_element.map(ToPrimitive::to_usize).flatten().is_some() {
+        count_sort_impl(src, max_element.copied().expect("is some value"))
     }
 }
-
-impl Num for u8 {}
-impl Num for u16 {}
-impl Num for u32 {}
-impl Num for u64 {}
-impl Num for usize {}
-
 
 /// Count sort implementation
 ///
 /// Because of conditions stated in the module [doc]() we parametrize function with a number type value.
 /// Unfortunately this algorithm requires additional space, which is a good example of space - time tradeoff.
-pub fn count_sort<T: Num>(src: &mut[T], max_element: T) {
+fn count_sort_impl<T: ToPrimitive + PartialOrd + Copy>(src: &mut[T], max_element: T) {
     match src.len() {
         0 | 1 => {}
-        _ => count_sort_impl(src, max_element),
+        _ => count_sort_rec_proc(src, max_element),
     }
 }
 
-fn count_sort_impl<T: Num>(src: &mut[T], max_element: T) {
-    let amount_of_elements = Vec::with_capacity(src.len());
-    for k in src {
-
-    }
+/// Count sort recursive procedure
+fn count_sort_rec_proc<T: ToPrimitive + PartialOrd + Copy>(src: &mut[T], max_element: T) {
+    // src
+    //     .iter()
+    //     .filter_map(usize::from)
+    //
+    //
+    // let max_element = usize::from(max_element).expect("rec proc callable for types, that can be converted to usize");
+    // let amount_of_elements = Vec::with_capacity(max_element);
+    // for k in src {
+    //
+    // }
 }
