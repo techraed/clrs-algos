@@ -14,15 +14,18 @@
 //! Should be mentioned that it is a [stable](https://en.wikipedia.org/wiki/Sorting_algorithm#Stability) sorting algorithm, which is an important feature
 //! for some other algorithms that can use count sort, for example, [radix sort](todo).
 
-use num::{ToPrimitive, Unsigned, FromPrimitive};
+use std::convert::TryInto;
+
+use num::{ToPrimitive, FromPrimitive};
 
 /// Count sort entry function
 ///
 /// If `src` inner data has a primitive type and can be casted to usize, then the sort will be performed.
 /// Otherwise no mutations will be made on `src`.
-pub fn count_sort<T: FromPrimitive + ToPrimitive + Unsigned + Ord + Copy + Default>(src: &mut [T]) {
+pub fn count_sort<T: FromPrimitive + ToPrimitive + TryInto<usize> + Ord + Copy + Default>(src: &mut [T]) {
+    let min_element = src.iter().min().copied().map(TryInto::<usize>::try_into).map(Result::ok).flatten();
     let max_element = src.iter().max().copied();
-    if max_element.map(|element| element.to_usize()).flatten().is_some() {
+    if min_element.is_some() && max_element.map(|element| element.to_usize()).flatten().is_some() {
         count_sort_impl(src, max_element.expect("is some value"))
     }
 }
@@ -31,7 +34,7 @@ pub fn count_sort<T: FromPrimitive + ToPrimitive + Unsigned + Ord + Copy + Defau
 ///
 /// Because of conditions stated in the module [doc]() we parametrize function with a number type value.
 /// Unfortunately this algorithm requires additional space, which is a good example of space - time tradeoff.
-fn count_sort_impl<T: FromPrimitive + ToPrimitive + Unsigned + Ord + Copy + Default>(src: &mut[T], max_element: T) {
+fn count_sort_impl<T: FromPrimitive + ToPrimitive + Ord + Copy + Default>(src: &mut[T], max_element: T) {
     match src.len() {
         0 | 1 => {}
         _ => count_sort_proc(src, max_element),
@@ -40,7 +43,7 @@ fn count_sort_impl<T: FromPrimitive + ToPrimitive + Unsigned + Ord + Copy + Defa
 
 /// Count sort recursive procedure
 /// todo передай сразу usize элементы
-fn count_sort_proc<T: FromPrimitive + ToPrimitive + Unsigned + Ord + Copy + Default>(src: &mut[T], max_element: T) {
+fn count_sort_proc<T: FromPrimitive + ToPrimitive + Ord + Copy + Default>(src: &mut[T], max_element: T) {
     let mut sorted: Vec<T> = vec![T::default(); src.len()];
     let max_element = max_element.to_usize().expect("rec proc callable for types, that can be converted to usize");
     let mut keys_count: Vec<usize> = vec![0; max_element + 1];
@@ -65,18 +68,13 @@ fn count_sort_proc<T: FromPrimitive + ToPrimitive + Unsigned + Ord + Copy + Defa
 
 #[test]
 fn count_sort_test() {
-    use num::FromPrimitive;
-
     use crate::test_utils::get_test_vectors;
 
-    for (input, sorted) in get_test_vectors() {
-        if input.iter().any(|&v| v < 0) { continue; }
-
-        let mut input = input.into_iter().flat_map(usize::from_i32).collect::<Vec<_>>();
-        let sorted = sorted.into_iter().flat_map(usize::from_i32).collect::<Vec<_>>();
-        count_sort(&mut input[..]);
-
-        assert_eq!(input, sorted);
+    for (input, sorted) in get_test_vectors().iter_mut() {
+        count_sort(input);
+        if input.iter().all(|&v| v >= 0) {
+            assert_eq!(input, sorted);
+        }
     }
 }
 
