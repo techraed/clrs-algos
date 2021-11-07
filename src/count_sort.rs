@@ -16,7 +16,7 @@
 
 use std::convert::TryInto;
 
-use num::{FromPrimitive, ToPrimitive};
+use num::FromPrimitive;
 
 /// Count sort entry function
 ///
@@ -25,7 +25,8 @@ use num::{FromPrimitive, ToPrimitive};
 pub fn count_sort<T: FromPrimitive + TryInto<usize> + Ord + Copy + Default>(src: &mut [T]) {
     let min_element = src.iter().min().copied().map(TryInto::<usize>::try_into).map(Result::ok).flatten();
     let max_element = src.iter().max().copied();
-    if min_element.is_some() && src.len() > 1 { // `src` of length 1 is sorted
+    if min_element.is_some() && src.len() > 1 {
+        // `src` of length 1 is sorted
         count_sort_impl(src, max_element.expect("there is at least one element in src"))
     }
 }
@@ -36,7 +37,10 @@ pub fn count_sort<T: FromPrimitive + TryInto<usize> + Ord + Copy + Default>(src:
 /// Unfortunately this algorithm requires additional space, which is a good example of space - time tradeoff.
 fn count_sort_impl<T: FromPrimitive + TryInto<usize> + Ord + Copy + Default>(src: &mut [T], max_element: T) {
     let mut sorted: Vec<T> = vec![T::default(); src.len()];
-    let max_element = max_element.try_into().ok().expect("this fn is callable for types, that can be converted to usize");
+    let max_element = max_element
+        .try_into()
+        .ok()
+        .expect("this fn is callable for types, that can be converted to usize");
     let mut keys_count: Vec<usize> = vec![0; max_element + 1];
     for key in &src[..] {
         if let Ok(key) = (*key).try_into() {
@@ -64,9 +68,10 @@ fn count_sort_test() {
     for (input, sorted) in get_test_vectors().iter_mut() {
         count_sort(input);
 
-        if input.iter().any(|&v| v < 0) { continue ;}
+        if input.iter().any(|&v| v < 0) {
+            continue;
+        }
 
         assert_eq!(input, sorted);
-
     }
 }
