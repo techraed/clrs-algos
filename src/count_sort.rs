@@ -16,7 +16,7 @@
 
 use std::convert::TryInto;
 
-use num::{ToPrimitive, FromPrimitive};
+use num::{FromPrimitive, ToPrimitive};
 
 /// Count sort entry function
 ///
@@ -34,7 +34,7 @@ pub fn count_sort<T: FromPrimitive + ToPrimitive + TryInto<usize> + Ord + Copy +
 ///
 /// Because of conditions stated in the module [doc]() we parametrize function with a number type value.
 /// Unfortunately this algorithm requires additional space, which is a good example of space - time tradeoff.
-fn count_sort_impl<T: FromPrimitive + ToPrimitive + Ord + Copy + Default>(src: &mut[T], max_element: T) {
+fn count_sort_impl<T: FromPrimitive + ToPrimitive + Ord + Copy + Default>(src: &mut [T], max_element: T) {
     match src.len() {
         0 | 1 => {}
         _ => count_sort_proc(src, max_element),
@@ -43,7 +43,7 @@ fn count_sort_impl<T: FromPrimitive + ToPrimitive + Ord + Copy + Default>(src: &
 
 /// Count sort recursive procedure
 /// todo передай сразу usize элементы
-fn count_sort_proc<T: FromPrimitive + ToPrimitive + Ord + Copy + Default>(src: &mut[T], max_element: T) {
+fn count_sort_proc<T: FromPrimitive + ToPrimitive + Ord + Copy + Default>(src: &mut [T], max_element: T) {
     let mut sorted: Vec<T> = vec![T::default(); src.len()];
     let max_element = max_element.to_usize().expect("rec proc callable for types, that can be converted to usize");
     let mut keys_count: Vec<usize> = vec![0; max_element + 1];
@@ -52,7 +52,7 @@ fn count_sort_proc<T: FromPrimitive + ToPrimitive + Ord + Copy + Default>(src: &
             keys_count[key] += 1;
         }
     }
-    for idx in 0..keys_count.len()  {
+    for idx in 0..keys_count.len() {
         if idx != 0 {
             keys_count[idx] += keys_count[idx - 1];
         }
@@ -77,4 +77,3 @@ fn count_sort_test() {
         }
     }
 }
-
