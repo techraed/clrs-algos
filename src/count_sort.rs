@@ -20,13 +20,13 @@ use num::{FromPrimitive, ToPrimitive};
 
 /// Count sort entry function
 ///
-/// If `src` inner data has a primitive type and can be casted to usize, then the sort will be performed.
+/// If `src` inner data has a primitive type, **instances** of which are in the range of `usize`, then the sort will be performed.
 /// Otherwise no mutations will be made on `src`.
 pub fn count_sort<T: FromPrimitive + ToPrimitive + TryInto<usize> + Ord + Copy + Default>(src: &mut [T]) {
     let min_element = src.iter().min().copied().map(TryInto::<usize>::try_into).map(Result::ok).flatten();
     let max_element = src.iter().max().copied();
-    if min_element.is_some() && max_element.map(|element| element.to_usize()).flatten().is_some() {
-        count_sort_impl(src, max_element.expect("is some value"))
+    if min_element.is_some() {
+        count_sort_impl(src, max_element.expect("there is at least one element in src"))
     }
 }
 
@@ -36,7 +36,7 @@ pub fn count_sort<T: FromPrimitive + ToPrimitive + TryInto<usize> + Ord + Copy +
 /// Unfortunately this algorithm requires additional space, which is a good example of space - time tradeoff.
 fn count_sort_impl<T: FromPrimitive + ToPrimitive + Ord + Copy + Default>(src: &mut [T], max_element: T) {
     match src.len() {
-        0 | 1 => {}
+        1 => {}
         _ => count_sort_proc(src, max_element),
     }
 }
@@ -72,8 +72,10 @@ fn count_sort_test() {
 
     for (input, sorted) in get_test_vectors().iter_mut() {
         count_sort(input);
-        if input.iter().all(|&v| v >= 0) {
-            assert_eq!(input, sorted);
-        }
+
+        if input.iter().any(|&v| v < 0) { continue ;}
+
+        assert_eq!(input, sorted);
+
     }
 }

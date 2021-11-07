@@ -4,10 +4,15 @@
 ///
 /// "Left-right" means smaller values "bubble" to the left.
 pub fn bubble_sort_rl<T: PartialOrd + Clone>(src: &mut [T]) {
-    for i in 0..src.len() - 1 {
-        for j in (i + 1..src.len()).rev() {
-            if src[j] < src[j - 1] {
-                src.swap(j, j - 1);
+    match src.len() {
+        0 | 1 => {},
+        n => {
+            for i in 0..n - 1 {
+                for j in (i + 1..n).rev() {
+                    if src[j] < src[j - 1] {
+                        src.swap(j, j - 1);
+                    }
+                }
             }
         }
     }
@@ -17,10 +22,15 @@ pub fn bubble_sort_rl<T: PartialOrd + Clone>(src: &mut [T]) {
 ///
 /// "right-left"  means biggest values "bubble" to the right.
 pub fn bubble_sort_lr<T: PartialOrd + Clone>(src: &mut [T]) {
-    for i in (1..src.len()).rev() {
-        for j in 0..i {
-            if src[j] > src[j + 1] {
-                src.swap(j, j + 1);
+    match src.len() {
+        0 | 1 => {},
+        n => {
+            for i in (1..n).rev() {
+                for j in 0..i {
+                    if src[j] > src[j + 1] {
+                        src.swap(j, j + 1);
+                    }
+                }
             }
         }
     }

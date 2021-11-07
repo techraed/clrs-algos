@@ -11,8 +11,10 @@ pub(crate) fn test_sorting_algorithm(f: fn(&mut [i32])) -> Result<(), ()> {
 }
 
 #[cfg(test)]
-pub(crate) fn get_test_vectors() -> [(Vec<i32>, Vec<i32>); 20] {
+pub(crate) fn get_test_vectors() -> [(Vec<i32>, Vec<i32>); 22] {
     [
+        (vec![], vec![]),
+        (vec![1], vec![1]),
         (vec![6, 0, 2, 0, 1, 3, 4, 6, 1, 3, 2], vec![0, 0, 1, 1, 2, 2, 3, 3, 4, 6, 6]),
         (vec![10, 7, 8, 1, 9, 5], vec![1, 5, 7, 8, 9, 10]),
         (vec![9, 2, 3, 4, 1, 6, 8, 19, 20, 34], vec![1, 2, 3, 4, 6, 8, 9, 19, 20, 34]),
