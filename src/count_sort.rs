@@ -23,7 +23,7 @@ use num::FromPrimitive;
 ///
 /// If `src` length is greater than 1 and its inner data has a primitive type, **instances** of which are in the range of `usize`, then the sort will be performed.
 /// Otherwise no mutations will be made on `src`.
-pub fn count_sort<T: FromPrimitive + TryInto<usize> + Ord + Copy + Default>(src: &mut [T]) {
+pub fn count_sort<T: FromPrimitive + TryInto<usize> + Ord + Copy>(src: &mut [T]) {
     let min_element = src.iter().min().copied().map(TryInto::<usize>::try_into).map(Result::ok).flatten();
     let max_element = src.iter().max().copied();
     if min_element.is_some() && src.len() > 1 {
@@ -34,32 +34,70 @@ pub fn count_sort<T: FromPrimitive + TryInto<usize> + Ord + Copy + Default>(src:
 
 /// Count sort implementation
 ///
-/// Because of conditions stated in the module [doc]() we parametrize function with a number type value.
-/// Unfortunately this algorithm requires additional space, which is a good example of space - time tradeoff.
-fn count_sort_impl<T: FromPrimitive + TryInto<usize> + Ord + Copy + Default>(src: &mut [T], max_element: T) {
-    let mut sorted: Vec<T> = vec![T::default(); src.len()];
+/// Because of conditions stated in the module [doc](index.html) we parametrize function with a number type value.
+/// Unfortunately this algorithm requires *O(max_element)* additional space, which is a good example of space - time tradeoff.
+/// 
+/// A closer to CLRS version:
+/// ```rust
+/// # use std::convert::TryInto;
+///
+/// # use num::FromPrimitive;
+/// fn count_sort_impl<T: FromPrimitive + TryInto<usize> + Ord + Copy + Default>(src: &mut [T], max_element: T) {
+///     let mut sorted: Vec<T> = vec![T::default(); src.len()];
+///     let max_element = max_element
+///         .try_into()
+///         .ok()
+///         .expect("this fn is callable for types, that can be converted to usize");
+///     let mut keys_count: Vec<usize> = vec![0; max_element + 1];
+///     for &key in &src[..] {
+///         if let Ok(key) = key.try_into() {
+///             keys_count[key] += 1;
+///         }
+///     }
+///     for idx in 0..keys_count.len() {
+///         if idx != 0 {
+///             keys_count[idx] += keys_count[idx - 1];
+///         }
+///     }
+///     for &key in &src[..] {
+///         if let Ok(key_usize) = key.try_into() {
+///             sorted[keys_count[key_usize] - 1] = key;
+///             keys_count[key_usize] -= 1;
+///         }
+///     }
+///     src.copy_from_slice(&sorted[..])
+/// }
+/// ```
+fn count_sort_impl<T: FromPrimitive + TryInto<usize> + Ord + Copy>(src: &mut [T], max_element: T) {
+    #[inline]
+    fn increment(v: usize) -> usize {
+        v + 1
+    }
+
     let max_element = max_element
         .try_into()
         .ok()
         .expect("this fn is callable for types, that can be converted to usize");
-    let mut keys_count: Vec<usize> = vec![0; max_element + 1];
+    let mut keys_count: Vec<Option<usize>> = vec![None; max_element + 1];
     for &key in &src[..] {
         if let Ok(key) = key.try_into() {
-            keys_count[key] += 1;
+            keys_count[key] = keys_count[key].or(Some(0)).map(increment);
         }
     }
-    for idx in 0..keys_count.len() {
-        if idx != 0 {
-            keys_count[idx] += keys_count[idx - 1];
+
+    let mut key = 0;
+    let mut src_idx = 0;
+    while key < keys_count.len() {
+        let count = keys_count[key];
+        if let Some(mut count) = count {
+            while count != 0 {
+                src[src_idx] = T::from_usize(key).expect("key was derived from T");
+                src_idx += 1;
+                count -= 1;
+            }
         }
+        key += 1;
     }
-    for &key in &src[..] {
-        if let Ok(key_usize) = key.try_into() {
-            sorted[keys_count[key_usize] - 1] = key;
-            keys_count[key_usize] -= 1;
-        }
-    }
-    src.copy_from_slice(&sorted[..])
 }
 
 #[test]
