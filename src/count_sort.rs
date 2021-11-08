@@ -69,19 +69,14 @@ pub fn count_sort<T: FromPrimitive + TryInto<usize> + Ord + Copy>(src: &mut [T])
 /// }
 /// ```
 fn count_sort_impl<T: FromPrimitive + TryInto<usize> + Ord + Copy>(src: &mut [T], max_element: T) {
-    #[inline]
-    fn increment(v: usize) -> usize {
-        v + 1
-    }
-
-    let max_element = max_element
+     let max_element = max_element
         .try_into()
         .ok()
         .expect("this fn is callable for types, that can be converted to usize");
     let mut keys_count: Vec<Option<usize>> = vec![None; max_element + 1];
     for &key in &src[..] {
         if let Ok(key) = key.try_into() {
-            keys_count[key] = keys_count[key].or(Some(0)).map(increment);
+            keys_count[key] = keys_count[key].or(Some(0)).map(|count| count + 1);
         }
     }
 
