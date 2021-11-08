@@ -1,8 +1,9 @@
 //! Count sort. With some conditions has a O(n) time complexity.
 //!
-//! One of the main features of the algorithms is that to sort then input array you don't have to do any comparisons. Actually there is a [theorem](https://stackoverflow.com/questions/61330147/comparison-based-sorting-is-wc-min-time-nlogn-so-what-about-best-average-case)
+//! There is a [theorem](https://stackoverflow.com/questions/61330147/comparison-based-sorting-is-wc-min-time-nlogn-so-what-about-best-average-case)
 //! that states that the best time in worst case for comparison algorithms is *Ω(n * log n)*.
-//! The idea is quite simple:
+//!
+//! One of the main features of this algorithm is that to sort the input array you don't have to do any comparisons. The idea is quite simple:
 //! - you count number of each element in the input array;
 //! - you count number of elements less than some current element;
 //! - if you have 3 elements less than the element `x`, then the first `x` entry in the input has a position `input[3]`.
@@ -12,7 +13,7 @@
 //! and 2) *k = O(n)* , then we have *O(n+k) = O(n+n) = O(n)* time complexity.
 //!
 //! Should be mentioned that it is a [stable](https://en.wikipedia.org/wiki/Sorting_algorithm#Stability) sorting algorithm, which is an important feature
-//! for some other algorithms that can use count sort, for example, [radix sort](todo).
+//! for some other algorithms that can use count sort, for example, [radix sort](../radix_sort/index.html).
 
 use std::convert::TryInto;
 
