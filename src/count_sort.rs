@@ -43,8 +43,8 @@ fn count_sort_impl<T: FromPrimitive + TryInto<usize> + Ord + Copy + Default>(src
         .ok()
         .expect("this fn is callable for types, that can be converted to usize");
     let mut keys_count: Vec<usize> = vec![0; max_element + 1];
-    for key in &src[..] {
-        if let Ok(key) = (*key).try_into() {
+    for &key in &src[..] {
+        if let Ok(key) = key.try_into() {
             keys_count[key] += 1;
         }
     }
@@ -53,10 +53,10 @@ fn count_sort_impl<T: FromPrimitive + TryInto<usize> + Ord + Copy + Default>(src
             keys_count[idx] += keys_count[idx - 1];
         }
     }
-    for key in &src[..] {
-        if let Ok(key) = (*key).try_into() {
-            sorted[keys_count[key] - 1] = T::from_usize(key).expect("key was derived from T");
-            keys_count[key] -= 1;
+    for &key in &src[..] {
+        if let Ok(key_usize) = key.try_into() {
+            sorted[keys_count[key_usize] - 1] = key;
+            keys_count[key_usize] -= 1;
         }
     }
     src.copy_from_slice(&sorted[..])
