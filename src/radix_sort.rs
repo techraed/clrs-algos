@@ -5,8 +5,8 @@ use num::PrimInt;
 const BASE_10: u8 = 10;
 
 /// There are two reference implementations:
-/// 1. Using buckets: https:///github.com/weihanglo/rust-algorithm-club/tree/master/src/sorting/radix_sort
-/// 2. Using count sort as a subroutine https:///github.com/myyrakle/buldak/blob/main/src/lib/radix.rs
+/// 1. Using count sort as a subroutine: https:///github.com/weihanglo/rust-algorithm-club/tree/master/src/sorting/radix_sort + https://brilliant.org/wiki/radix-sort/
+/// 2. Using buckets https:///github.com/myyrakle/buldak/blob/main/src/lib/radix.rs + https://blog.logrocket.com/radix-sort-no-comparisons-required/
 /// Ideas to make radix sort better:
 /// 1. more generic using traits
 /// 2. rebasing numbers in accordance to equations from CLRS
