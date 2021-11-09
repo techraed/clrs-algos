@@ -17,6 +17,7 @@ const BASE_10: u8 = 10;
 /// and sort numbers in `src` by each of their digits. Sorting by a digit using buckets simply means that we store a number in a bucket, which serves
 /// current sorting digit. For more explanation [see](https://blog.logrocket.com/radix-sort-no-comparisons-required/).
 pub fn radix_sort<T: PrimInt + Ord + Copy>(src: &mut [T]) {
+    let max_digits = count_max_digits(src);
     todo!()
 }
 
@@ -24,6 +25,7 @@ fn count_max_digits<T: PrimInt + Ord + Copy>(src: &mut[T]) -> usize {
     let mut max = src.iter().max().copied().expect("at least one element is in src");
     let divisor = T::from(BASE_10).expect("BASE value suits any number type width");
     let mut max_digits = 1;
+    // todo or we could do (max.to_f64().unwrap().log10() + 1) as usize
     loop {
         max = max / divisor;
         if max == T::zero() {
