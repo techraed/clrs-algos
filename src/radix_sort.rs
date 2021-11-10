@@ -1,5 +1,7 @@
 //! Radix sort. With some conditions has a O(n) time complexity.
 
+use std::collections::VecDeque;
+
 use num::PrimInt;
 
 const BASE_10: u8 = 10;
@@ -18,6 +20,11 @@ const BASE_10: u8 = 10;
 /// current sorting digit. For more explanation [see](https://blog.logrocket.com/radix-sort-no-comparisons-required/).
 pub fn radix_sort<T: PrimInt + Ord + Copy>(src: &mut [T]) {
     let max_digits = count_max_digits(src);
+    let buckets = vec![VecDeque::<T>::new(); BASE_10 as usize];
+    let neg_buckets = vec![VecDeque::<T>::new(); BASE_10 as usize];
+    for _ in 0..max_digits {
+
+    }
     todo!()
 }
 
@@ -35,9 +42,15 @@ fn count_max_digits<T: PrimInt + Ord + Copy>(src: &mut[T]) -> usize {
     }
 }
 
+// todo change name for `divisor`
+fn get_digit<T: PrimInt + Ord + Copy>(num: T, radix: u32) -> T {
+    let divisor = T::from(BASE_10).expect("BASE value suits any number type width");
+    num / divisor.pow(radix - 1) % divisor
+}
+
 #[cfg(test)]
 mod tests {
-    use super::count_max_digits;
+    use super::{count_max_digits, get_digit};
 
     #[test]
     fn test_digits_count() {
@@ -45,5 +58,14 @@ mod tests {
         assert_eq!(count_max_digits(&mut [123123]), 6);
         assert_eq!(count_max_digits(&mut [0, 0, 0]), 1);
         assert_eq!(count_max_digits(&mut [u128::MAX]), 39);
+    }
+
+    #[test]
+    fn test_get_digit() {
+        // just some simple tests
+        assert_eq!(get_digit(123123, 1), 3);
+        assert_eq!(get_digit(123123, 3), 1);
+        assert_eq!(get_digit(193123, 5), 9);
+        assert_eq!(get_digit(0, 2), 0);
     }
 }
